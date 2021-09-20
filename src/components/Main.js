@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 
+
+
 class Main extends Component {
 
   render() {
     return (
     <div id="content" >
-        <table className="table">
+        <table className="table" >
             <thead>
                 <tr>
                     <th scope="col">#</th>
@@ -14,6 +16,7 @@ class Main extends Component {
                 </tr>
             </thead>
             <tbody id="candidatesResults">
+                {this.props.displayCandidates}
             </tbody>
         </table>
 

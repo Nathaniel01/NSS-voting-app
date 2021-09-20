@@ -62,14 +62,14 @@ class App extends Component {
 
   displayCandidates = () => {
     let candidatesCount = this.state.election.methods.candidatesCount()
-    var candidatesResults = $("#candidatesResults");
+    var candidatesResults = 
     candidatesResults.empty();
 
-    var candidatesSelect = $('#candidatesSelect');
+    var candidatesSelect = 
     candidatesSelect.empty();
 
     for(var i = 1; i <= candidatesCount; i++){
-      let candidate = this.state.election.methods.candidate(i).call()
+      let candidate = this.state.election.methods.candidates(i).call()
       var id = candidate[0];
       var name = candidate[1]
       var voteCount = candidate[2]
@@ -81,6 +81,10 @@ class App extends Component {
       var candidateOption = "<option value='" + id + "' >" + name + "</ option>"
       candidatesSelect.append(candidateOption);
     }
+  }
+
+  addTable = (tableElements) => {
+    console.log(tableElements)
   }
 
 
@@ -101,7 +105,7 @@ class App extends Component {
       content = <p id="loader" className="text-center">Loading</p>
     } else {
       content = <Main
-        displayCandidates = {this.displayCandidates}
+        displayCandidates = {this.displayCandidates()}
         castVotes = {this.castVotes}
       />
     }
@@ -114,7 +118,7 @@ class App extends Component {
             <main role="main" className="col-lg-12 ml-auto mr-auto" style={{ maxWidth: '600px' }}>
               <div className="content mr-auto ml-auto">
                 <a
-                  href="http://www.dappuniversity.com/bootcamp"
+                  href=""
                   target="_blank"
                   rel="noopener noreferrer"
                 >
