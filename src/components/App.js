@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Web3 from 'web3'
-import $ from 'jquery'
+import { useTable } from 'react-table'
 import Election from '../abis/Election.json'
 import Main from './Main'
 import Navbar from './Navbar'
@@ -9,34 +9,70 @@ import './App.css'
 class App extends Component {
 
   //Lifecycle function for react to launch web3 and load blockchain
-  async componentWillMount(){
+  async componentWillMount() {
     await this.loadWeb3()
     await this.loadBlockchainData()
+
   }
 
-  async loadBlockchainData(){
+  async loadBlockchainData() {
     const web3 = window.web3
 
     //get account connected to the blockchain
     const accounts = await web3.eth.getAccounts()
     this.setState({ account: accounts[0] })
 
-
     // get the network id
     const networkID = await web3.eth.net.getId()
-    console.log('network Id: ' + networkID)
 
     //Load "Web3" version Election contract 
     const electionData = Election.networks[networkID]
 
-    if(electionData){
+    if (electionData) {
+      //Instantiate election data into state
       const election = new web3.eth.Contract(Election.abi, electionData.address)
       this.setState({ election })
-    }else {
+
+      //Load candidate count
+      let candidatesCount = await election.methods.candidatesCount().call()
+      this.setState({ candidatesCount })
+
+      //Load the required candidates
+      for (let i = 1; i <= this.state.candidatesCount; i++) {
+        let candidate = await election.methods.candidates(i).call()
+        let candidates = {}
+        candidates.id = candidate[0]
+        candidates.name = candidate[1]
+        candidates.voteCount = candidate[2]
+
+        this.setState(prevState => ({
+          candidateList: [...prevState.candidateList, candidates]
+        }))
+      }
+
+      var n = -3.5
+      const COLOR = ["red", "blue", "green"]
+      // Format data type for 3d graph
+      for (let i = 1; i <= this.state.candidatesCount; i++) {
+        let candidate = await election.methods.candidates(i).call()
+        let candidatesData = {}
+        candidatesData.x = n + 3.5
+        candidatesData.y = candidate[2]
+        candidatesData.z = 0
+        candidatesData.size = 1.5
+        candidatesData.color = COLOR[(i - 1)]
+
+        this.setState(prevState => ({
+          data: [...prevState.data, candidatesData]
+        }))
+      }
+      console.debug(JSON.stringify(this.state.data))
+      console.debug(JSON.stringify(this.state.candidateList))
+    } else {
       window.alert('Election contract not deployed on the detected network')
     }
 
-    this.setState({ loading: false})
+    this.setState({ loading: false })
   }
 
   //Metamask instructions to connect the app to the blockchain
@@ -54,39 +90,15 @@ class App extends Component {
   }
 
 
-  castVotes = () => {
-    this.setState({ loading: true})
-    var candidateResults = $("#candidatesResults")
-    this.setState({ loading: false})        
+  castVotes = (id) => {
+    console.log('Collected vote id', id)
+    this.setState({ loading: true })
+    let candidateID = id//get candidate by id
+      this.state.election.methods.vote(candidateID).send({ from: this.state.account }).on('transactionHash', (hash) => {
+        this.setState({ hasVoted: true })
+      })
+    this.setState({ loading: false })
   }
-
-  displayCandidates = () => {
-    let candidatesCount = this.state.election.methods.candidatesCount()
-    var candidatesResults = 
-    candidatesResults.empty();
-
-    var candidatesSelect = 
-    candidatesSelect.empty();
-
-    for(var i = 1; i <= candidatesCount; i++){
-      let candidate = this.state.election.methods.candidates(i).call()
-      var id = candidate[0];
-      var name = candidate[1]
-      var voteCount = candidate[2]
-
-      var candidateTemplate = "<tr><th>" + id + "</th><td>" + name + "</td><td>" + voteCount + "</td></tr>"
-      candidatesResults.append(candidateTemplate);
-
-      // Render candidate ballot option
-      var candidateOption = "<option value='" + id + "' >" + name + "</ option>"
-      candidatesSelect.append(candidateOption);
-    }
-  }
-
-  addTable = (tableElements) => {
-    console.log(tableElements)
-  }
-
 
   constructor(props) {
     super(props)
@@ -94,19 +106,24 @@ class App extends Component {
       election: {},
       account: '0x0',
       hasVoted: false,
-      loading: true
+      loading: true,
+      candidateList: [],
+      candidatesCount: 0,
+      data: []
     }
   }
 
   render() {
     //----Put loading screen
     let content
-    if(this.state.loading){
+    if (this.state.loading) {
       content = <p id="loader" className="text-center">Loading</p>
     } else {
       content = <Main
-        displayCandidates = {this.displayCandidates()}
-        castVotes = {this.castVotes}
+        candidateList={this.state.candidateList}
+        castVotes={this.castVotes}
+        data={this.state.data}
+        hasVoted={this.state.hasVoted}
       />
     }
 
