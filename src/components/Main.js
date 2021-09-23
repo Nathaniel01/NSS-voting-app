@@ -34,7 +34,7 @@ class Main extends Component {
                             </a-asset-item>
                         </a-asset>
                         <a-light type="point" intensity="1" position="-2 10 10"></a-light>
-                        <a-entity charts="type: bar; dataPoints:#data; axis_length: 12;"></a-entity>
+                        <a-entity charts="type: bar; dataPoints:#data; axis_length: 12; axis_negative: false"></a-entity>
                         <a-entity position="2 10 14" rotation="-30 15 0">
                             <a-camera position="3 -1 -7" rotation="0 -1 0">
                                 <a-cursor></a-cursor>
