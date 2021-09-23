@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import 'aframe';
-import App from './App'
 import './App.css'
 
 
@@ -13,6 +12,7 @@ class Main extends Component {
             voteDisabled: false,
             voteId: ''
         };
+    
     }
 
     handleChange = (event) => {
@@ -20,28 +20,36 @@ class Main extends Component {
         this.setState({ voteId: event.target.value });
     };
 
+    archarts = require('aframe-charts-component')
+
     render() {
-        var candidateData = JSON.stringify(this.props.data)
+        var candidateData = JSON.stringify(this.props.data);
         return (
-            <div className="ARGraph">
+
+            <div className="content">
                 <div id="embeddedScene">
-                    <a-scene background="color: grey" embedded>
+                    <a-scene background="color: grey" embedded >
+                        <a-asset>
+                            <a-asset-item id="data" src={candidateData}>
+                            </a-asset-item>
+                        </a-asset>
                         <a-light type="point" intensity="1" position="-2 10 10"></a-light>
-                        <a-entity charts="type: bar; dataPoints: candidateData; axis_length: 12"></a-entity>
+                        <a-entity charts="type: bar; dataPoints:#data; axis_length: 12;"></a-entity>
                         <a-entity position="2 10 14" rotation="-30 15 0">
-                            <a-camera position="3 -1 4" rotation="0 -1 0">
+                            <a-camera position="3 -1 -7" rotation="0 -1 0">
                                 <a-cursor></a-cursor>
                             </a-camera>
                         </a-entity>
                     </a-scene>
                 </div>
+
                 <form onSubmit={(event) => {
                     event.preventDefault()
                     this.props.castVotes(this.state.voteId)
                     this.setState({ voteDisabled: true })
                 }}>
                     <div className="form-group">
-                        <label htmlFor="candidatesSelect">Select Candidate</label>
+                        <label htmlFor="candidatesSelect">Select a candidate</label>
                         <select onChange={this.handleChange} value={this.state.voteId} className="form-control" id="candidatesSelect">
                             <option >Select an Option</option>
                             {this.props.candidateList && this.props.candidateList.map(candidate =>
@@ -51,7 +59,7 @@ class Main extends Component {
                             )}
                         </select>
                     </div>
-                    {!this.state.voteDisabled &&
+                    {!this.props.hasVoted &&
                         <button type="submit" className="btn btn-primary" >Vote</button>
                     }
                     <hr />

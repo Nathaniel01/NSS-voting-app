@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Web3 from 'web3'
-import { useTable } from 'react-table'
 import Election from '../abis/Election.json'
 import Main from './Main'
 import Navbar from './Navbar'
@@ -50,22 +49,30 @@ class App extends Component {
         }))
       }
 
-      var n = -3.5
       const COLOR = ["red", "blue", "green"]
+      var n = -3.5
       // Format data type for 3d graph
       for (let i = 1; i <= this.state.candidatesCount; i++) {
         let candidate = await election.methods.candidates(i).call()
         let candidatesData = {}
-        candidatesData.x = n + 3.5
+        n = n + 3.5
+
+        candidatesData.x = n
         candidatesData.y = candidate[2]
         candidatesData.z = 0
-        candidatesData.size = 1.5
+        candidatesData.size = 1
         candidatesData.color = COLOR[(i - 1)]
 
         this.setState(prevState => ({
           data: [...prevState.data, candidatesData]
         }))
       }
+
+      // Check too see if account has voted.
+      let voterStatus = await election.methods.voters(this.state.account).call()
+      console.log(voterStatus)
+      this.setState({ hasVoted: voterStatus})
+
       console.debug(JSON.stringify(this.state.data))
       console.debug(JSON.stringify(this.state.candidateList))
     } else {

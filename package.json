@@ -5,6 +5,8 @@
   "author": "gregory@dappuniversity.com",
   "dependencies": {
     "aframe": "^1.2.0",
+    "aframe-charts-component": "^2.1.11",
+    "aframe-inspector": "git+https://github.com/aframevr/aframe-inspector.git",
     "babel-polyfill": "6.26.0",
     "babel-preset-env": "1.7.0",
     "babel-preset-es2015": "6.24.1",
