@@ -42,7 +42,15 @@ class Main extends Component {
                         </a-entity>
                     </a-scene>
                 </div>
-
+                <p></p>
+                <label htmlFor="legend">Legend</label>
+                <div className="card mb-4">
+                    <div className="card-body">
+                        <div>Red Column:<a href="https://www.noahsarkhospice.org.uk/">Noah's Ark Children's Hospice</a></div>
+                        <div>Blue Column:<a href="https://www.mind.org.uk/">Mind</a></div>
+                        <div>Green Column:<a href="https://www.habcentre.org/">Homeless action in Barnet</a></div>
+                    </div>
+                </div>
                 <form onSubmit={(event) => {
                     event.preventDefault()
                     this.props.castVotes(this.state.voteId)
