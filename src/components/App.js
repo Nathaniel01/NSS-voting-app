@@ -68,7 +68,7 @@ class App extends Component {
         }))
       }
 
-      // Check too see if account has voted.
+      // Check if account has voted.
       let voterStatus = await election.methods.voters(this.state.account).call()
       console.log(voterStatus)
       this.setState({ hasVoted: voterStatus})
